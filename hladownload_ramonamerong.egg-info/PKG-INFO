@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: hladownload-ramonamerong
+Version: 0.0.1
+Summary: Python commandline program and module for retrieving HLA alleles, frequencies and eplets.
+Home-page: https://github.com/pypa/sampleproject
+Author: Ramon van Amerongen
+Author-email: ramonamerong@live.nl
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/pypa/sampleproject/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8.5
+Description-Content-Type: text/markdown
+License-File: LICENCE
+
+# Example Package
+
+This is a simple example package. You can use
+[Github-flavored Markdown](httpsguides.github.comfeaturesmastering-markdown)
+to write your content.
+
