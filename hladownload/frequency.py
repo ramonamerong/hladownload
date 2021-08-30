@@ -1,5 +1,5 @@
 #Import general modules
-import argparse, requests
+import argparse, requests, re
 import pandas as pd
 from os.path import join, isdir
 
@@ -85,30 +85,126 @@ def retrieveFrequencies(regions, loci):
     return regionMean, globalMean
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="This program is intended to retrieve and parse allele frequencies from the allele frequency database (http://www.allelefrequencies.net) and output them into two table files: One with the average allele frequency per region and the other globally. The total sample size it is also calculated per row.")
-    parser.add_argument("-o", "--output_folder", help="File or directory to write the output to. Defaults to the current folder.", default = '')
-    parser.add_argument("-e", "--output_extension", help="Extension that should be used for the output files. Defaults to 'csv'.", default = 'csv')
-    parser.add_argument("-d", "--output_delimiter", help="Delimiter that should be used for the output file. Defaults to ','.", default = ',')
-    parser.add_argument("-t", "--test_run", action='store_true', help=f"Flag to indicate that only allele frequencies of the first region ('{regions[0]}'') and locus ('{frequencyLoci[0]}') should be retrieved and saved for testing purposes.")
-    args = parser.parse_args()
-    testRun = args.test_run
-    
-    #Check if the output folder is indeed a folder
-    if not isdir(args.output_folder) and args.output_folder != '':
-        raise FileNotFoundError(f'{args.output_folder} is not a valid directory.')
+#Function to only preserve allele frequencies for alleles which can also be found in the alignment object. 
+#When enabling 'addHigher' and/or 'addLower' any lower/higher resolution alleles with frequencies
+#will also be reported. When noNull is set to true, any higher/lower resolution null alleles will be excluded
+def filterFrequencies(regionMean, globalMean, specifiedAlleles, addHigher = False, addLower = False, noNull = False):
 
-    #Retrieve the frequencies averaged per region and over all regions (globally)
-    regionMean, globalMean = retrieveFrequencies(regions, frequencyLoci, testRun)
+    #Create indexes for the tables by looping over them
+    regionIndex = {}
+    for i, row in regionMean.iterrows():
 
-    #Save the frequencies to the output folder into two files
-    regionOutput = join(args.output_folder, f'{regionOutputFile}.{args.output_extension}')
-    globalOutput = join(args.output_folder, f'{globalOutputFile}.{args.output_extension}')
+        #Skip any null alleles if noNull is True
+        if noNull and row['allele'].endswith('N'):
+            continue
 
-    regionMean.to_csv(regionOutput, index=False, sep=args.output_delimiter)
-    globalMean.to_csv(globalOutput, index=False, sep=args.output_delimiter)
+        region = row['region']
+        if region not in regionIndex:
+            regionIndex[region] = {}
 
-    print(f'Allele frequencies saved to {args.output_folder}.')
+        fields = re.split(r'\*|:', row['allele'])
+        currentDict = regionIndex[region]
+        for j, field in enumerate(fields):
+
+            if field not in currentDict:
+                currentDict[field] = {'higher': {}, 'index': None}
+
+            if j < len(fields) - 1:
+                currentDict = currentDict[field]['higher']
+            else:
+                currentDict[field]['index'] = i
+
+        currentDict = None
+
+    # def printRes(allele):
+    #     if allele['index'] is not None:
+    #         print(regionMean.loc[allele['index']])
+    #     for higherAllele in allele['higher'].values():
+    #         printRes(higherAllele)
+
+    # for allele in regionIndex['Australia'].values():
+    #     printRes(allele)
+
+    globalIndex = {}
+    for i, row in globalMean.iterrows():
+
+        #Skip any null alleles if noNull is True
+        if noNull and row['allele'].endswith('N'):
+            continue
+
+        fields = re.split(r'\*|:', row['allele'])
+        currentDict = globalIndex
+        for j, field in enumerate(fields):
+
+            if field not in currentDict:
+                    currentDict[field] = {'higher': {}, 'index': None}
+
+            if j < len(fields) - 1:
+                currentDict = currentDict[field]['higher']
+            else:
+                currentDict[field]['index'] = i
+
+    #Specify a function to look using the fields of a specified allele to look in the index dictionaries 
+    #for all indices of higher/lower resulution alleles
+    filteredRegion = set()
+    filteredGlobal = set()
+
+    def searchAlleles(fields, filteredSet, currDict):
+        resolution = 0
+
+        def searchHigherAlleles(allele):
+            if allele['index'] is not None and addHigher:
+                filteredSet.add(allele['index'])
+            for higherAllele in allele['higher'].values():
+                searchHigherAlleles(higherAllele)
+
+        while len(currDict) > 0:
+
+            #Try to retrieve an allele of an higher resolution
+            try:
+                allele = currDict[fields[resolution]]
+            #If it fails, stop searching for indexes
+            except KeyError:
+                break
+            
+            #When the current resolution is that of the number of fields - 1, the allele has been found
+            #add it then iterate over all it's higher resolution children to add them
+            if resolution == len(fields) - 1:
+                if allele['index'] is not None:
+                    filteredSet.add(allele['index'])
+                searchHigherAlleles(allele)
+                break
+
+            #Otherwise add the lower resolution's allele's index to the filtered set 
+            #and continue seaching
+            if allele['index'] is not None and addLower:
+                filteredSet.add(allele['index'])
+            currDict = allele['higher']
+            resolution += 1
+                
+
+    #For every specified allele...
+    for specifiedAllele in specifiedAlleles:
+
+        #Split the allele into fields
+        fields = re.split(r'\*|:', specifiedAllele)
+
+        #Add indices higher/lower resolution allele frequencies to the filtered region set
+        for region, currentDict in regionIndex.items():
+            searchAlleles(fields, filteredRegion, currentDict)
+               
+        #Add indices higher/lower resolution allele frequencies to the filtered global set
+        searchAlleles(fields, filteredGlobal, globalIndex)
+
+    regionMean = regionMean.iloc[list(filteredRegion)]
+    globalMean = globalMean.iloc[list(filteredGlobal)]
+
+    return regionMean, globalMean
 
 
-
+#Function to save the frequencies to the output folder into two files, representing the region and global average allele frequencies
+def saveFrequencies(regionMean, globalMean, outputFolder, outputDelimiter, outputExtension):
+    regionOutput = join(outputFolder, f'{regionOutputFile}.{outputExtension}')
+    globalOutput = join(outputFolder, f'{globalOutputFile}.{outputExtension}')
+    regionMean.to_csv(regionOutput, index=False, sep=outputDelimiter)
+    globalMean.to_csv(globalOutput, index=False, sep=outputDelimiter)

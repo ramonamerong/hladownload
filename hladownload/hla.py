@@ -1,5 +1,6 @@
 #Import modules
 import json, Bio, re, os, requests, pickle
+from os.path import join, isdir
 from collections import Counter
 from copy import copy
 from Bio import SeqIO, AlignIO
@@ -117,6 +118,16 @@ def countAlignment(alignment, charLen = 1):
 
         counts.append({'count': count, 'alleles': alleles})
     return counts
+
+#Function to save Biopython's alignment objects
+def saveAlignment(alignment, fileName, outputFolder, format):
+    
+    #Check if the output folder is indeed a folder
+    if not isdir(outputFolder) and outputFolder != '':
+        raise FileNotFoundError(f'{outputFolder} is not a valid directory.')
+    
+    #Save the alignment
+    AlignIO.write(alignment, join(outputFolder, f'{fileName}.{format}'), format)
 
 #Define class to represent all aligned HLA alleles, the used references and useful methods/operators
 #When no alignment input is given, the alignment files per locus are retrieved from the internet, a databaseVersion can then be given to be used (the default is 'Latest').
@@ -301,13 +312,52 @@ class HLA:
                         alleleDict[locus] = [rec.id]
             return alleleDict
 
-    #Method to save the current instance of the class as a pickle to the output folder
-    def save(self, outputFolder):
-        whichAlleles = 'nonull' if self.noNull else 'all'
-        outputFile = os.path.join(outputFolder, f'{self.databaseVersion}-{whichAlleles}.pickle')
-        with open(outputFile, 'wb') as f:
-            pickle.dump(self, f)
-            print(f'Pickle of HLA object succesfully saved to \'{outputFile}\'.')
+    #Method to save the current instance of the class as a pickle or alignments to the output folder
+    #When specifying an alignment format, the alignments can be sliced by giving slice string as values 
+    #for loci in sliceDict, such as {'A': '1-10,15,20-25', 'B': ...}.
+    #The type of slicing can also be specified by sliceType, which must either be 'gaps', 'no_gaps' or 'amino',
+    #to preserve gaps introduced in the reference sequence, remove them or translate everything to amino acids.
+    def save(self, outputFolder, format = 'pickle', sliceDict = {}, sliceType = 'gaps'):
+
+        #Check if the output folder is indeed a folder
+        if not isdir(outputFolder) and outputFolder != '':
+            raise FileNotFoundError(f'{outputFolder} is not a valid directory.')
+        
+        #Save the current object as a pickle
+        if format == 'pickle':
+            whichAlleles = 'nonull' if self.noNull else 'all'
+            outputFile = os.path.join(outputFolder, f'{self.databaseVersion}-{whichAlleles}.pickle')
+            with open(outputFile, 'wb') as f:
+                pickle.dump(self, f)
+                print(f'Pickle of HLA object succesfully saved to \'{outputFile}\'.')
+
+        #Save the current object as separate alignment files
+        else:
+
+            #Convert the slice string to slice objects
+            for locus, sliceString in sliceDict.items():
+                try:
+                    sliceObject = [int(rng) if not '-' in rng else slice(*[int(i) for i in rng.split('-')]) for rng in sliceString.split(',')]
+                    sliceDict[locus] = sliceObject
+                except:
+                    raise ValueError("The slice strings in sliceDict are in an incorrect format, it should be: {'A': '1-10,15,20-25', 'B': ...}")
+
+            #When at least a single allele is present in a locus alignment, slice the alignment if necessary and save it
+            for locus, locusAlignment in self.alignments.items():
+                if locus in sliceDict:
+                    if sliceType == 'gaps':
+                        alignment = locusAlignment.slice[sliceDict[locus]]
+                    elif sliceType == 'no_gaps':
+                        alignment = locusAlignment.cod[sliceDict[locus]]
+                    elif sliceType == 'amino':
+                        alignment = locusAlignment.amino[sliceDict[locus]]
+                    else:
+                        raise ValueError("The sliceType is not 'gaps', 'no_gaps' or 'amino'.")
+                else:
+                    alignment = locusAlignment.alignment
+
+                saveAlignment(alignment, locus, outputFolder , format)
+
 
 #Class for wrapping around a locus alignment.
 #Slice operators can be used as a shortcut of <locusAlignment>.alignment[].
