@@ -1,2 +1,3 @@
-hladownload/__pychache__/*
-hladownload/alignmentCache/*
+hladownload/__pychache__/
+hladownload/alignmentCache/
+/output/
