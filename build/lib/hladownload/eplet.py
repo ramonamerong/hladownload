@@ -4,7 +4,11 @@ from os import listdir
 from os.path import join, isdir, isfile
 
 #Import local modules
-from hla import *
+sys.path.append('')
+try:
+    from _1_alignment_utility.scripts.alignment import *
+except:
+    pass
 
 #Define constants
 testRun = False
@@ -83,6 +87,14 @@ def retrieveEplets(locusGroups = None):
         print(f'{locusGroup} eplets succesfully retrieved from {url}')
     
     return tables
+
+#Function to save the dataframes retrieved by 'retrieveEplets' into files
+def saveEplets(outputFolder, extension = 'csv', delimiter = ','):
+    tables = retrieveEplets()
+    for locusGroup, dataframe in tables.items():
+        outputPath = join(outputFolder, f'{locusGroup}-eplets.{extension}')
+        dataframe.to_csv(outputPath, sep=delimiter, index=False)
+        print(f'{locusGroup} eplets saved to {outputPath}.')
 
 #Function to parse a string of eplet residues and return a dictionary of them in a list mapped by their position.
 def parseEpletPositions(residues):
@@ -193,12 +205,12 @@ def mapEpletsToAlleles(eplets, alignmentObject, locusGroup, loci = None):
 
     return eplets
 
-#Function to retrieve the eplets and their mapped alleles into different tables.
+#Function to save the eplets and their mapped alleles into different tables.
 #The summary table describes general information for each eplet on each row.
 #The residue table has one residue per row for each eplet.
 #The allele table has one row per eplet / allele association.
 #It can be specified with 'allEplets' whether eplets without the alleles associated with them should be removed from the table
-def getMappedEpletTables(epletMaps, outputFolder, allEplets = True):
+def saveParsedEplets(epletMaps, outputFolder, extension = 'csv', delimiter = ',', allEplets = True):
     
     #Check if the output folder is indeed a folder
     if not isdir(outputFolder) and outputFolder != '':
@@ -238,6 +250,8 @@ def getMappedEpletTables(epletMaps, outputFolder, allEplets = True):
         'residue_table': pandas.DataFrame(data=residueTable, columns=residueTableHeader),
         'allele_table':  pandas.DataFrame(data=alleleTable, columns=alleleTableHeader)
     }
+    for name, table in tables.items():
+        table.to_csv(join(outputFolder, f'{name}-eplets.{extension}'), index=False, sep=delimiter)
 
     return tables
 
@@ -263,6 +277,4 @@ def saveEplets(outputFolder, alignmentObject, extension = 'csv', delimiter = ','
         epletMaps[locusGroup] = mapEpletsToAlleles(eplets, alignmentObject, locusGroup, loci)
 
     #Save the tables from the eplet maps
-    tables = getMappedEpletTables(epletMaps, outputFolder, allEplets = allEplets)
-    for name, table in tables.items():
-        table.to_csv(join(outputFolder, f'{name}-eplets.{extension}'), index=False, sep=delimiter)
+    saveParsedEplets(epletMaps, outputFolder, extension, delimiter, allEplets = allEplets)

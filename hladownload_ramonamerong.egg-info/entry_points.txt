@@ -1,0 +1,3 @@
+[console_scripts]
+hladownload = hladownload.__main__:main
+

@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    packages= ["hladownload"],
+    packages= setuptools.find_packages(include=["hladownload", "hladownload.*"]),
     entry_points = {
         "console_scripts": ['hladownload = hladownload.__main__:main']
     },

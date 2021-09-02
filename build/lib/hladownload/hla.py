@@ -298,7 +298,7 @@ class HLA:
         return self.alignments[locus]
 
     #Method to only return the allele names. When a locus is given, return the names of only that locus.
-    #When returnDict is True, return a dictionary with loci as keys and lists of the names as values (giving a locus name will not do anything then).
+    #When returnDict is True, return a dictionary loci as keys and lists of the names as values (giving a locus name then will not do anything).
     def names(self, optionalLocus = None, returnDict = False):
         if not returnDict:
             return [rec.id for locus, al in self.alignments.items() if locus not in ['DRB3', 'DRB4', 'DRB5'] for rec in al.alignment] if optionalLocus == None else [rec.id for rec in self.alignments[optionalLocus].alignment]

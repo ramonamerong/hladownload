@@ -1,0 +1,4 @@
+requests>=2.25.1
+pandas>=1.2.4
+biopython>=1.78
+lxml>=4.6.3
