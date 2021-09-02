@@ -36,19 +36,21 @@ These flags will enable you to specify the desired output: HLA allele sequences,
 * `-h, --help` Show an help message and exit.
 * `-o, --output_directory OUTPUT_DIRECTORY` Directory to save the output files to. For every output flag (`-H`, `-E` or `-F`) that is enabled, a separate directory (`/alleles`, `/eplets` or `/frequencies`) will be created in the output folder with the output files. The output folder defaults to the current folder.
 * `-d, --database_version DATABASE_VERSION` The IMGT/HLA database version github (https://github.com/ANHIG/IMGTHLA) to use to retrieve HLA alleles from. Defaults to the latest branch.
-* `-a, --alleles ALLELES` Indicate the HLA alleles for which an alignment, frequencies and/or eplets should be outputted. The alleles can be a combination of ranges and comma separated allele names without spaces: 'A\*01:01:01:01-A\*01:01:01:09,B\*01:01:01:01'. The default is all alleles for all loci that are included in the given IMGT/HLA database version.
+* `-a, --alleles ALLELES` Indicate the HLA alleles for which an alignment, frequencies and/or eplets should be outputted. The alleles can be a combination of ranges and comma separated allele names without spaces: 'A\*01:01:01:01-A\*01:01:01:09,B\*01:01:01:01'. If an allele cannot be found, it will be automatically replaced by its higher/lower resolution variants in the IMGT/HLA database. These alleles will then be reported in the eventual alignment and eplet files. However, for allele frequencies higher/lower resolution alleles will only serve as a replacement if both their allele frequencies can be found and if the flags `->` and/or `-<` have been used. The default is that all alleles of the given IMGT/HLA database version are included (for HLA alignment and eplets) or all alleles for which frequencies can be found (for frequencies).
 * `-A, --alleles_file ALLELES_FILE` Indicate in a file the HLA alleles for which an alignment, frequencies and/or eplets should be outputted. The allele names should be separated by new lines in the file. This argument overrides the alleles specified with `-a`.
 * `-n, --no_null` Flag to indicate whether HLA null alleles should be excluded.
 * `-g, --group_DRB345` Flag to indicate whether HLA alleles of the DRB3, -4 and -5 loci should be grouped under a single locus 'DRB345'.
 
 ### Examples
-**Will be updated later!**
+`hladownload -a A*31:01 -o output -H -s A 1-10 -E -F -r Europe Australia -> -n`
+Using this command, no alleles corresponding to 'A\*31:01' will be found in the IMGT/HLA alleles. Therefore, higher resolution alleles are returned instead for which only codons 1 up to 9 are preserved in the eventual sequence and only eplets occuring in these alleles will be reported. In addition, allele frequencies of A*\31:01 or of higher resolution alleles will be reported from the region Europe and Australia. Null alleles, however, will all be excluded from the results (otherwise allele A\*31:01:02:03N could have been included). The output files of this example can be found under `example_output` on this repository.
 
 ## Python modules
 When this program has been installed, different submodules can be found under `hladownload`:
 ```
 from hladownload import hla, eplet, frequency
 ```
+See the previous section about [output flags](#output-flags) to see which HLA loci each module supports.
 
 ### HLA submodule
 The `hla` submodule uses IMGT/HLA per locus allele alignments to allow easy retrieval and slicing of HLA allele sequences/alignments.
@@ -214,9 +216,9 @@ eplet | polymorphic_residues | antibody_reactivity
 Alternatively, the function `retrieveEplets(output)` (explained below) can be used instead to download all of these files automatically:
 1. `retrieveEplets()`: This function is used to parse the HTML pages per loci of the [eplet registry database](https://www.epregistry.com.br/index/databases/database/ABC/) into pandas dataframes per locus group which are then returned in a dictionary.
 1. `parseResidues(residues)`: This function parses the string of polymorphic residues as found in the column table and returns a dictionary of their positions as keys and their possible amino acids in a list as values.
-1. `readEplets(input, delimiter)`: This function either reads a table from a file or from a pandas dataframe in order to construct a dictionary with the eplet names as keys. As values there is another dictionary indicating whether the eplet has been verified to have antibody reactivity ('`verified`') and which polymorphic residues it encompasses ('`residues`'). These residues are contained in the dictionary that is returned by `parseResidues()`.
-1. `mapEpletsToAlleles(eplets, alignmentObject, locusGroup, loci)`: This function requires the eplet dictionary returned by `readEplets()` and an HLA alignment object (which should preferably not contain null alleles). These are then used to determine which eplets are contained in which alleles, but only for those alleles that belong to a locus that is included in the `locusGroup` of the eplet in question. You can also optionally restrict for which locus of the locus groups eplets should be reported with `loci`. A similar dictionary as `eplets` is returned, with the addition of the '`alleles`' key which contains allele name lists mapped by their locus in a dictionary.
-4. `getMappedEpletTables(epletMaps, outputFolder, allEplets)`: This function takes the dictionary generated by `mapEpletsToAlleles()`. It then converts all of the information into three pandas tables. It can be specified with 'allEplets' whether eplets without the alleles associated with them should be removed from these tables:
+1. `readEplets(input, delimiter)`: This function either reads a table for a single locus group from a file or from a pandas dataframe in order to construct a dictionary with the eplet names as keys. As values there is another dictionary indicating whether the eplet has been verified to have antibody reactivity ('`verified`') and which polymorphic residues it encompasses ('`residues`'). These residues are contained in the dictionary that is returned by `parseResidues()`.
+1. `mapEpletsToAlleles(eplets, alignmentObject, locusGroup, loci)`: This function requires the eplet dictionary for a single locus group returned by `readEplets()` and an HLA alignment object (which should preferably not contain null alleles). These are then used to determine which eplets are contained in which alleles, but only for those alleles that belong to a locus that is included in `locusGroup` and, if specified, is present in `loci`. A similar dictionary as `eplets` is returned, with the addition of the '`alleles`' key which contains allele name lists mapped by their locus in a dictionary.
+4. `getMappedEpletTables(epletMaps, outputFolder, allEplets)`: This function takes a dictionary with as keys the locus groups and as values the different dictionaries generated by `mapEpletsToAlleles()`. It then converts all of the information into three pandas tables. It can be specified with 'allEplets' whether eplets without the alleles associated with them should be removed from these tables:
     1. `eplet_summary.csv`: Contains general information of the eplet on each row.
         1. `eplet`: The eplet name. This is included in all tables in order to identify an eplet.
         1. `locus_group`: The locus group the eplet belongs to. This is defined on [the eplet registry website](https://www.epregistry.com.br/index/databases/database/ABC) and is necessary  in order to distinguish eplets with the same name but from different loci (groups).
@@ -224,24 +226,70 @@ Alternatively, the function `retrieveEplets(output)` (explained below) can be us
         1. `verified`: This shows whether the eplet has been verified to have antibody reactivity.
         1. `residue_number`: The number of residues that are represented by the eplet.
         1. `loci`: Comma separated loci names. These loci contain alleles with the eplet.
-    | eplet | locus_group | loci | verified | residue_number | allele_number |
-    | --- | --- | --- | --- | --- | --- |
-    | 9Y | ABC | A,B | True | 2 | 2 | 
+        
+      eplet | locus_group | loci | verified | residue_number | allele_number
+      --- | --- | --- | --- | --- | ---
+      9Y | ABC | A,B | True | 2 | 2
+    
     1. `eplet_residues.csv`: Contains information on the residue positons and amino acids per eplet. Each eplet and residue is a separate row.
         1. `position`: Amino acid position of the residue.
         1. `residue`: One letter code for the amino acid residue. Sporadically, this can feature multiple amino acids separated by a '`,`'.
-    | eplet | locus_group | position | residue |
-    | --- | --- | --- | --- |
-    | 9Y | ABC | 8 | V |
-    | 9Y | ABC | 9 | Y |
+    
+      eplet | locus_group | position | residue
+      --- | --- | --- | ---
+      9Y | ABC | 8 | V
+      9Y | ABC | 9 | Y
+    
     1. `eplet_alleles.csv`: Contains information on which alleles are associated with which eplets. Each row is repesented by an eplet/allele association.
         1. `locus`: The locus the allele belong to.
         1. `allele`: The allele name of the allele that contains the eplet.
-    | eplet | locus_group | locus | allele |
-    | --- | --- | --- | --- |
-    | 9Y | ABC | A | A\*01:01 |
-    | 9Y | ABC | B | B\*01:01 |
     
-1. `saveEplets(outputFolder, alignmentObject, extension, allEplets, loci)`: This is an overall function which uses the above ones to directly save the resulting eplet tables as ',' separated `.csv` files by default. You can optionally restrict for which loci eplets should be reported with 'loci'.
+      eplet | locus_group | locus | allele
+      --- | --- | --- | ---
+      9Y | ABC | A | A\*01:01
+      9Y | ABC | B | B\*01:01
+    
+1. `saveEplets(outputFolder, alignmentObject, extension, allEplets, loci)`: This function uses all of the functions above to directly save the resulting eplet tables as ',' separated `.csv` files by default. You can optionally restrict for which loci eplets should be reported with 'loci'.
+
+Example code
+```
+#Retrieve and save the eplets that are associated with the alleles of only the MHCI loci
+saveEplets('eplets', HLAObject, allEplets=False, loci=['A', 'B', 'C'])
+```
 
 ### Frequency submodule
+The `frequency` submodule contains three functions which in order retrieve, filter and save HLA allele frequencies from different global regions:
+1. `retrieveFrequencies(regions, loci)`: This function requests `html` pages with the allele frequency table from the [allele frequencies website](http://www.allelefrequencies.net/) and converts them into dataframes. A new request (e.g. `http://www.allelefrequencies.net/hla6006a_scr.asp?hla_region=Europe&hla_locus=A&hla_show=>`) and thus dataframe is created per region and locus that is specified in the list parameters (see [the command line program for the available regions](#`-f`-additional-arguments). The average of the allele frequencies is then taken to obtain the region average for every allele. The resulting dataframes with region averages are then concatenated into one big dataframe with the following structure:
+ 
+ allele | avg_frequency | total_sample_size | locus | region
+ --- | --- | --- | --- | ---
+ A\*01:01 | 0.07 | 503 | A | Australia
+
+ In order to obtain global allele frequencies, the region averages are again averaged. This is to ensure that the frequencies of every region contribute evenly to the global average. If only a selection of regions is given, only frequencies of these regions will be averaged. The resulting dataframe is structured as follows:
+
+ allele | avg_frequency | total_sample_size | locus | num_regions
+ --- | --- | --- | --- | ---
+ A\*01:01 | 0.06 | 3389704 | A | 11
+
+ - `allele`: The allele name.
+ - `avg_frequency`: The average frequency over either a single region or all regions. 
+ - `total_sample_size`: The total number of individuals a given (average) frequency is based on. This is calculated by summing all the sample sizes of the individual studies. 
+ - `locus`: The locus the allele belongs to.
+ - `region`: The region over which all frequencies were averaged.
+ - `num_region`: The number of average region frequencies that were used to calculate the global average.
+ Both groups of dataframes are eventually returned as a tuple `(regionMean, globalMean)` with the regionMean consisting of a dictionary with per region a dataframe and globalMean being one big dataframe.
+ 
+3. `filterFrequencies(regionMean, globalMean, specifiedAlleles, addHigher, addLower, noNull)`: This optional function takes both the region and global dataframes and removes frequencies of alleles which are not included in the list `specifiedAlleles`. In case either `addHigher` or `addLower` is set to true frequencies of either higher or lower resolution alleles of the `specifiedAlleles` will be preserved. If `noNull` is set to true, frequencies of null alleles are removed by default. The dataframes are again returned in the same type of tuple as by `retrieveFrequencies()`.
+4. `saveFrequencies(regionMean, globalMean, outputFolder, outputDelimiter, outputExtension)`: This function takes the dataframes of either of the above functions and saves them to an output folder as `region_frequencies.<extension>` and `global_frequencies.<extension>`.
+
+Example code:
+```
+#Retrieve the frequencies averaged per region and over all regions (globally)
+regionMean, globalMean = retrieveFrequencies(regions, loci)
+
+#Filter them and remove all null alleles, while keeping any higher resolution alleles
+regionMean, globalMean = filterFrequencies(regionMean, globalMean, specifiedAlleles, addHigher=True, noNull=True)
+
+#Save the tables
+saveFrequencies(regionMean, globalMean, 'frequencies')
+```
