@@ -1,10 +1,10 @@
 #Import general modules
 import argparse, pandas, requests, re, sys
-from os import listdir
+from os import listdir, getcwd
 from os.path import join, isdir, isfile
 
 #Import local modules
-from hla import *
+from .hla import *
 
 #Define constants
 testRun = False

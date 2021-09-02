@@ -1,0 +1,4 @@
+allele,avg_frequency,total_sample_size,locus,region
+A*31:01,0.028702439024390246,170912,A,Europe
+A*31:01:02,0.026685714285714285,28077,A,Europe
+A*31:01:02,0.01675,503,A,Australia

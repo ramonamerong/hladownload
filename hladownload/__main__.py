@@ -12,13 +12,8 @@ from .frequency import *
 #https://guides.github.com/features/mastering-markdown/
 #setup.py: https://godatadriven.com/blog/a-practical-guide-to-using-setup-py/
 #To do
-# - Add explanation about saveAlignment(), HLA.save(), saveEplets(), filterFrequencies, saveFrequencies
-# - Add examples:
-#   - `python -m hladownload -F -a A*31:01 -o output -r Europe Australia -< -n`, all alleles are:
-                                                                                # A*31
-                                                                                # A*31:01
-                                                                                # A*31:01:02
-                                                                                # A*31:01:02:03N
+# - Add eplet dictionary code, frequency request parameters
+# - Check whether alignmentCache should be deleted when updating the package
 
 def main():
     parser = argparse.ArgumentParser(description="This tool can be used to automatically download HLA allele sequencies (flag -H), eplets/epitopes (flag -E) and frequencies (flag -F) from various online sources.")
