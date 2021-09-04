@@ -9,7 +9,7 @@ if os.path.isdir('hladownload'):
 
 setuptools.setup(
     name="hladownload",
-    version="0.0.3",
+    version="0.0.4",
     author="Ramon van Amerongen",
     author_email="ramonamerong@live.nl",
     description="Python command line program and module for retrieving HLA alleles, frequencies and eplets.",
