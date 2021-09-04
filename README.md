@@ -259,7 +259,11 @@ saveEplets('eplets', HLAObject, allEplets=False, loci=['A', 'B', 'C'])
 
 ### Frequency submodule
 The `frequency` submodule contains three functions which in order retrieve, filter and save HLA allele frequencies from different global regions:
-1. `retrieveFrequencies(regions, loci)`: This function requests `html` pages with the allele frequency table from the [allele frequencies website](http://www.allelefrequencies.net/) and converts them into dataframes. A new request (e.g. `http://www.allelefrequencies.net/hla6006a_scr.asp?hla_region=Europe&hla_locus=A&hla_show=>`) and thus dataframe is created per region and locus that is specified in the list parameters (see [the command line program for the available regions](#`-f`-additional-arguments). The average of the allele frequencies is then taken to obtain the region average for every allele. The resulting dataframes with region averages are then concatenated into one big dataframe with the following structure:
+1. `retrieveFrequencies(regions, loci)`: This function requests `html` pages with the allele frequency table from the [allele frequencies website](http://www.allelefrequencies.net/) and converts them into dataframes. A new request (e.g. `http://www.allelefrequencies.net/hla6006a_scr.asp?hla_region=Europe&hla_locus=A&hla_show=>`) and thus dataframe is created per region and locus that is specified in the list parameters and will be converted to the following request parameters (see [the command line program for the available regions](#`-f`-additional-arguments):
+ - '`hla_region`': Specificy from which region the allele frequencies should be displayed.
+ - '`hla_locus`': Specificy from which locus the allele frequencies should be displayed.
+ - '`hla_show`': Specificy whether only `negative`, `positive` or all allele frequencies (`all`) should be displayed (`all` by default, but can be changed by providing `positive` or `negative` as arguments).
+ The average of the allele frequencies is then taken to obtain the region average for every allele. The resulting dataframes with region averages are then concatenated into one big dataframe with the following structure:
  
  allele | avg_frequency | total_sample_size | locus | region
  --- | --- | --- | --- | ---
