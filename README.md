@@ -7,9 +7,13 @@ This can either be done through the [command line program](#command-line-program
 
 ## Installation
 There are several ways to use and install this program.
-* ```python -m hladownload``` When this or an OS equivelant command is run in a folder with the files of this repository, the command line program can be used without any further installation. However, it is required that the python dependencies listed in `setup.py` are installed.
+* ```python -m hladownload``` When this or an OS equivelant command is run in a folder with the files of [the github repository of this project](https://github.com/ramonamerong/hladownload), the command line program can be used without any further installation. However, it is required that the python dependencies listed in `setup.py` are installed.
 * ```python setup.py install``` This command must also be run in a folder with the repository files. The tool will then be installed under the current used python installation and will be available on the command line or in python through the name '`hladownload`'.
 * ```pip install hladownload``` This command will download the tool through pip. **Not available yet as of now!**
+
+For uninstallation you can do:
+```pip uninstall hladownload```
+You could also get a prompt asking if 'possible manually installed files' should be deleted. These cache files are created by the program in the folder `hladownload/alignmentCache`  and can safely be deleted.
 
 ## Command line program
 The command line program has several arguments which will be explained and highlighted in an example here.
@@ -43,7 +47,7 @@ These flags will enable you to specify the desired output: HLA allele sequences,
 
 ### Examples
 `hladownload -a A*31:01 -o output -H -s A 1-10 -E -F -r Europe Australia -> -n`
-Using this command, no alleles corresponding to 'A\*31:01' will be found in the IMGT/HLA alleles. Therefore, higher resolution alleles are returned instead for which only codons 1 up to 9 are preserved in the eventual sequence and only eplets occuring in these alleles will be reported. In addition, allele frequencies of A*\31:01 or of higher resolution alleles will be reported from the region Europe and Australia. Null alleles, however, will all be excluded from the results (otherwise allele A\*31:01:02:03N could have been included). The output files of this example can be found under `example_output` on this repository.
+Using this command, no alleles corresponding to 'A\*31:01' will be found in the IMGT/HLA alleles. Therefore, higher resolution alleles are returned instead for which only codons 1 up to 9 are preserved in the eventual sequence and only eplets occuring in these alleles will be reported. In addition, allele frequencies of A*\31:01 or of higher resolution alleles will be reported from the region Europe and Australia. Null alleles, however, will all be excluded from the results (otherwise allele A\*31:01:02:03N could have been included). The output files of this example can be found under `example_output` on [the github repository of this project](https://github.com/ramonamerong/hladownload).
 
 ## Python modules
 When this program has been installed, different submodules can be found under `hladownload`:
