@@ -9,15 +9,15 @@ if os.path.isdir('hladownload'):
 
 setuptools.setup(
     name="hladownload",
-    version="0.0.1",
+    version="0.0.2",
     author="Ramon van Amerongen",
     author_email="ramonamerong@live.nl",
     description="Python commandline program and module for retrieving HLA alleles, frequencies and eplets.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/ramonamerong/hladownload",
     project_urls={
-        "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
+        "Bug Tracker": "https://github.com/ramonamerong/hladownload/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
