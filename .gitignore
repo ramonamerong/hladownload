@@ -1,8 +1,0 @@
-.gitignore
-hladownload/__pycache__/
-hladownload/alignmentCache/
-/output/
-pip_test_token.txt
-to_do.txt
-/dist/
-/hladownload.egg-info/
