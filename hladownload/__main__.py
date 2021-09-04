@@ -12,7 +12,6 @@ from .frequency import *
 #https://guides.github.com/features/mastering-markdown/
 #setup.py: https://godatadriven.com/blog/a-practical-guide-to-using-setup-py/
 #To do
-# - Add eplet dictionary code, frequency request parameters
 # - Check whether alignmentCache should be deleted when updating the package
 
 def main():
@@ -50,7 +49,7 @@ def main():
 
     #Only continue if at least one output type is given and the output directory exists
     if not args.HLA and not args.eplet and not args.frequency:
-        exit('Specify at least one output type with the flags -H, -E or -F.')
+        exit('Specify at least one output type with the flags -H, -E or -F. Use -h for additional help.')
     if args.output_directory != '' and not isdir(args.output_directory):
         exit(f"'{args.output_directory}' is not an existing output folder.")
 

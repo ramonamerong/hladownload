@@ -1,5 +1,6 @@
 #Import general modules
 import argparse, requests, re
+import html
 import pandas as pd
 from os.path import join, isdir
 
@@ -22,9 +23,20 @@ requestHeader = {
 
 #Function to retrieve the frequencies from the allele frequencies website (http://www.allelefrequencies.net/).
 #A tuple of dataframes is returned with all of the frequencies averaged per region and over all regions respectively.
-#The samples sizes are also summed up.
-def retrieveFrequencies(regions, loci):
-    
+#The samples sizes are also summed up. You can specify whether you want only 'positive', 'negative' or 'all' types of frequencies.
+def retrieveFrequencies(regions, loci, hlaShow = 'all'):
+
+    #When hlaShow is '<' or '>' assign it to the request parameters
+    #when it is 'both' set it to None, otherwise throw an error
+    if hlaShow == 'negative':
+        params['hla_show'] = '='
+    elif hlaShow == 'positive':
+        params['hla_show'] = '>'
+    elif hlaShow == 'all':
+        params['hla_show'] = None
+    else:
+        raise ValueError("'hlaShow' should either be '<', '>' or 'both'.")
+
     #Loop over ever region and locus to retrieve all allele frequencies
     dfs = []
     for region in regions:
@@ -35,6 +47,7 @@ def retrieveFrequencies(regions, loci):
             params['hla_locus'] = locus
             params['hla_region'] = region
             result = requests.get(frequencyURL, headers=requestHeader, params=params, timeout=None)
+            print(f'Frequencies succesfully retrieved from {result.url}')
             df = pd.read_html(result.text, attrs={'class':'tblNormal'})[0]
 
             #Filter the table to drop the 'Line' column (so it get not averaged)

@@ -1,10 +1,14 @@
-import setuptools
+import setuptools, os, shutil
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+if os.path.isdir('hladownload'):
+    if os.path.isdir('hladownload/alignmentCache'):
+        shutil.rmtree('hladownload/alignmentCache')
+
 setuptools.setup(
-    name="hladownload-ramonamerong",
+    name="hladownload",
     version="0.0.1",
     author="Ramon van Amerongen",
     author_email="ramonamerong@live.nl",
