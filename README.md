@@ -9,7 +9,7 @@ This can either be done through the [command line program](#command-line-program
 There are several ways to use and install this program.
 * ```python -m hladownload``` When this or an OS equivelant command is run in a folder with the files of [the github repository of this project](https://github.com/ramonamerong/hladownload), the command line program can be used without any further installation. However, it is required that the python dependencies listed in `setup.py` are installed.
 * ```python setup.py install``` This command must also be run in a folder with the repository files. The tool will then be installed under the current used python installation and will be available on the command line or in python through the name '`hladownload`'.
-* ```pip install hladownload``` This command will download the tool through pip. **Not available yet as of now!**
+* ```pip install hladownload``` This command will download the tool through [pip](https://pypi.org/project/hladownload).
 
 For uninstallation you can do:
 ```pip uninstall hladownload```
