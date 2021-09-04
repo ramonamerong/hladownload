@@ -33,8 +33,8 @@ These flags will enable you to specify the desired output: HLA allele sequences,
 
 ### `-F` additional arguments
 * `-r, --region REGION1 REGION2 etc...` Indicate the regions separated by spaces for which the HLA frequencies should be retrieved. A region consisting of multiple words should be enclosed in quotes. If no regions are specified all of the regions will be reported. If it is specified the global frequencies will only be based on the average of those regions. <br>*Usable regions are: Australia, Europe, North Africa, North America, North-East Asia, Oceania, South and Central America, South Asia, South-East Asia, Sub-Saharan Africa, Western Asia*
-* `->, --higher_resolution` Flag to indicate that frequencies of higher resolution alleles of the specified alleles (see '-a' or '-A') should also be reported.
-* `-<, --lower_resolution` Flag to indicate that frequencies of lower resolution alleles of the specified alleles (see '-a' or '-A') should also be reported.
+* `-hr, --higher_resolution` Flag to indicate that frequencies of higher resolution alleles of the specified alleles (see '-a' or '-A') should also be reported.
+* `-lr, --lower_resolution` Flag to indicate that frequencies of lower resolution alleles of the specified alleles (see '-a' or '-A') should also be reported.
 
 ### Other arguments
 * `-h, --help` Show an help message and exit.
