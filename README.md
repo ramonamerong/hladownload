@@ -301,3 +301,6 @@ regionMean, globalMean = filterFrequencies(regionMean, globalMean, specifiedAlle
 #Save the tables
 saveFrequencies(regionMean, globalMean, 'frequencies')
 ```
+
+## Contact
+For (future) suggestions or bugs you can either make a issue on the [github](https://github.com/ramonamerong/hladownload) or contact me via my email ramonamerong@live.nl.
