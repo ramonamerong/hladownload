@@ -7,13 +7,6 @@ from .hla import *
 from .eplet import *
 from .frequency import *
 
-#https://packaging.python.org/tutorials/packaging-projects/
-#https://gehrcke.de/2014/02/distributing-a-python-command-line-application/
-#https://guides.github.com/features/mastering-markdown/
-#setup.py: https://godatadriven.com/blog/a-practical-guide-to-using-setup-py/
-#To do
-# - Check whether alignmentCache should be deleted when updating the package
-
 def main():
     parser = argparse.ArgumentParser(description="This tool can be used to automatically download HLA allele sequencies (flag -H), eplets/epitopes (flag -E) and frequencies (flag -F) from various online sources.")
     alleleGroup = parser.add_argument_group(f'HLA allele alignment output arguments (-H)\nSupported loci: {", ".join(HLALoci)}')
@@ -30,8 +23,8 @@ def main():
     frequencyGroup = parser.add_argument_group(f'HLA frequency output arguments (-F)\nSupported loci: {", ".join(frequencyLoci)}')
     frequencyGroup.add_argument("-F", "--frequency", action='store_true', help="Flag to indicate that HLA allele frequencies should be retrieved from the allele frequency database (http://www.allelefrequencies.net) and outputted into two table files: One with the average allele frequency per region and the other globally (averaged over all (specified) regions). The total sample size is also calculated per row.")
     frequencyGroup.add_argument("-r", "--region", nargs='*', metavar='REGION', choices=regions, default=regions, help=f'Indicate the regions separated by spaces for which the HLA frequencies should be retrieved. A region consisting of multiple words should be enclosed in quotes. If no regions are specified all of the regions will be reported. If it is specified the global frequencies will only be based on the average of those regions. Usable regions are: {", ".join(regions)}')
-    frequencyGroup.add_argument("->", "--higher_resolution", action='store_true', default=False, help=f'Flag to indicate that frequencies of higher resolution alleles of the specified alleles (see \'-a\' or \'-A\') should also be reported.')
-    frequencyGroup.add_argument("-<", "--lower_resolution", action='store_true', default=False,  help=f'Flag to indicate that frequencies of lower resolution alleles of the specified alleles (see \'-a\' or \'-A\') should also be reported.')
+    frequencyGroup.add_argument("-hr", "--higher_resolution", action='store_true', default=False, help=f'Flag to indicate that frequencies of higher resolution alleles of the specified alleles (see \'-a\' or \'-A\') should also be reported.')
+    frequencyGroup.add_argument("-lr", "--lower_resolution", action='store_true', default=False,  help=f'Flag to indicate that frequencies of lower resolution alleles of the specified alleles (see \'-a\' or \'-A\') should also be reported.')
 
     otherGroup = parser.add_argument_group('Other arguments')
     otherGroup.add_argument("-o", "--output_directory", help="Directory to save the output files to. For every output flag (-H, -E or -F) that is enabled, a separate directory (/alleles, /eplets or /frequencies) will be created in the output folder with the output files. The output folder defaults to the current folder.", default = '')
