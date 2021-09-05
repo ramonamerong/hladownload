@@ -31,12 +31,30 @@ defaultCodonStarts = {
 }
 HLALoci = list(defaultCodonStarts.keys())
 
+#Function to retrieve the IMGT/HLA latest database version from their github
+latestDbVersion = None
+def getLatestDbVersion():
+    
+    #Retrieve, the latest db version if it has not already been determined
+    global latestDbVersion
+    if latestDbVersion is None:
+        completeUrl = defaultUrl.replace('msf/', 'Allele_status.txt')
+        text = requests.get(completeUrl).text
+        latestDbVersion = re.search(r'IPD-IMGT/HLA ([\d\.]+)', text[0:300]).group(1).replace('.', '')
+
+    #Print and return the latest dbVersion
+    print(f'Looking for latest IMGT/HLA database version number: {latestDbVersion}')
+    return latestDbVersion
+
 #Function to retrieve the alignment files from the github of IMGTHLA and save it locally when a outFolder is given.
 #A list of loci can either be provided or the default is used and a database version can also be given (default is 'Latest').
 #In any case a dictionary of file strings is returned
 def downloadAlignments(outFolder = None, molecule = 'nt', loci = defaultLoci, databaseVersion = 'Latest'):
     alignments = {}
-    databaseVersion = str(databaseVersion)
+    databaseVersion = str(databaseVersion).replace('.', '')
+    if databaseVersion != 'Latest' and getLatestDbVersion() == databaseVersion:
+        databaseVersion = 'Latest'
+
     for locus in loci:
 
         #Recontruct the file name
@@ -76,6 +94,10 @@ def loadAlignments(input, dbVersion = 'Latest', noNull = False):
             return pickle.load(f)
     elif os.path.isdir(input) or input == '':
         
+        #If the latest one should be returned, retrieve the latest db version number
+        if dbVersion == 'Latest':
+            dbVersion = getLatestDbVersion()
+
         #Check if an HLA object already exists as a .pickle.
         #If so, load and return it
         whichAlleles = 'nonull' if noNull else 'all'
@@ -137,7 +159,10 @@ def saveAlignment(alignment, fileName, outputFolder, format):
 class HLA:
     def __init__(self, alignmentInput = None, format = 'msf', codonStarts = defaultCodonStarts, databaseVersion = 'Latest', noNull = False):
         self.codonStart = defaultCodonStarts
-        self.databaseVersion = str(databaseVersion).replace('.', '')
+        if databaseVersion == 'Latest':
+            self.databaseVersion = getLatestDbVersion()
+        else:
+            self.databaseVersion = str(databaseVersion).replace('.', '')
         self.noNull = noNull
 
         #Setup two datastructures: One for the alignments per locus
@@ -685,7 +710,3 @@ class HLASlice(HLA):
             self.alignments[locus] = newLocusAlignment
         else:
             self.alignments[locus].alignment.append(allele)
-
-if __name__ == '__main__':
-    HLAObject = HLA('_1_alignment_utility/input/nuc_alignments')
-    HLAObject.save('_1_alignment_utility/output/alignment.pickle')
