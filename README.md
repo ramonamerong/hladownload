@@ -59,6 +59,8 @@ See the previous section about [output flags](#output-flags) to see which HLA lo
 ### HLA submodule
 The `hla` submodule uses IMGT/HLA per locus allele alignments to allow easy retrieval and slicing of HLA allele sequences/alignments.
 
+It is important to note that the default for the `dbVersion` or `databaseVersion` parameters in several functions and methods is always `Latest` which refers to the latest branch of the IMGT/HLA database github. The database version number can also be retrieved by executing the function `hla.getLatestDbVersion()`.
+
 #### Retrieving HLA allele alignment files
 The `hla.downloadAlignments(outFolder, molecule, loci)` function can be used to download the alignments per locus from [the database's GitHub](https://github.com/ANHIG/IMGTHLA/tree/Latest/msf) for all the loci that are present as strings in a list as part of the third parameter. The second parameter should specify whether to download nucleotide (`'nt', 'nuc', 'nucleotide'`) or amino acid (`'aa', 'prot', 'amino acid'`) alignments. The last parameter specifies which from which database version the files should be downloaded.
 
