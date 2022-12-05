@@ -24,10 +24,10 @@ requestHeader = {
 #Table header to construct the input dataframes with. 
 #If an column name is not included, it is removed from the dataframe.
 inputTableHeader = {
-    'Eplet': 'eplet',
-    'ElliProScore': 'ellipro_score',
-    'PolymorphicResidues': 'polymorphic_residues',
-    'AntibodyReactivity': 'antibody_reactivity',
+    'Name': 'eplet',
+    'Exposition': 'ellipro_score',
+    'Description': 'polymorphic_residues',
+    'Confirmation': 'antibody_reactivity',
 }
 #Construct a dictionary with locus group keys pointing to a list of loci names
 #and loci keys pointing to the locus group
@@ -77,7 +77,7 @@ def retrieveEplets(locusGroups = None):
         for columnName in list(df.columns):
             if re.sub(r'\s', '', columnName) not in inputTableHeader:
                 df.drop(columns=columnName, inplace=True)
-        df.columns = inputTableHeader.values()
+        df.rename(columns=inputTableHeader, inplace=True)
 
         tables[locusGroup] = df
         print(f'{locusGroup} eplets succesfully retrieved from {url}')
@@ -87,7 +87,7 @@ def retrieveEplets(locusGroups = None):
 #Function to parse a string of eplet residues and return a dictionary of them in a list mapped by their position.
 def parseEpletPositions(residues):
     epletPositions= {}
-    residues = re.sub(r'\s|\(|\)|', '', residues)
+    residues = re.sub(r'\s|\(|\)|\.', '', residues)
 
     #Basics: It is a number and an amino acid. 44R is an 'R' at position 44.
     #Complications:
@@ -100,14 +100,15 @@ def parseEpletPositions(residues):
     for i in range(0, len(residues)):
         residue = residues[i]
         if residue.isnumeric():
+            if epletPosition in epletPositions :
+                epletPosition = ''
             epletPosition += residues[i]
         elif residue != '/':
             epletPosition = int(epletPosition) 
             if epletPosition not in epletPositions:
                 epletPositions[epletPosition] = []
             epletPositions[epletPosition].append(residue)
-            epletPosition = ''
-
+            
     return epletPositions
 
 #Function to read eplets into a dictionary with per eplet key residues mapped to their positon as values in another dictionary.
