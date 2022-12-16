@@ -29,7 +29,7 @@ defaultCodonStarts = {
     "DPA1": -31,
     "DPB1": -29,
     "MICA": -23,
-    "MICB
+    "MICB: -23
 }
 HLALoci = list(defaultCodonStarts.keys())
 
