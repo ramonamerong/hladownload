@@ -11,7 +11,7 @@ from Bio.Data.CodonTable import TranslationError
 from io import StringIO
 
 #Define constants (DPA2/B2 is left out because they do not produce a well defined amino acid sequence, as they contain stop codons).
-defaultLoci = ['A', 'B', 'C', 'DRA', 'DRB1', 'DRB345', 'DQA1', 'DQA2', 'DQB1', 'DPA1', 'DPB1']
+defaultLoci = ['A', 'B', 'C', 'DRA', 'DRB1', 'DRB345', 'DQA1', 'DQA2', 'DQB1', 'DPA1', 'DPB1', 'MICA', 'MICB']
 defaultUrl = 'https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/msf/'
 defaultCodonStarts = {
     "A": -24,
@@ -28,6 +28,8 @@ defaultCodonStarts = {
     "DQB1": -32,
     "DPA1": -31,
     "DPB1": -29,
+    "MICA": -23,
+    "MICB
 }
 HLALoci = list(defaultCodonStarts.keys())
 
@@ -241,7 +243,7 @@ class HLA:
         elif isinstance(key, str):
             if re.match(r'HLA\d{5}', key):
                 return 'HLAID'
-            elif re.match(r'[\w]{1,6}\*\d{2,4}:\d{2,4}:\d{2,4}:\d{2,4}[^\W\d_]?|[\w]{1,6}\*\d{2,4}:\d{2,4}:\d{2,4}[^\W\d_]?|[\w]{1,6}\*\d{2,4}:\d{2,4}[^\W\d_]?', key):
+            elif re.match(r'[\w]{1,6}\*\d{2,4}:\d{2,4}:\d{2,4}:\d{2,4}[^\W\d_]?|[\w]{1,6}\*\d{2,4}:\d{2,4}:\d{2,4}[^\W\d_]?|[\w]{1,6}\*\d{2,4}:\d{2,4}[^\W\d_]?|[\w]{1,6}\*\d{2,4}[^\W\d_]?', key):
                 return 'HLAName'
             elif re.search(r'^[\w]{1,6}$', key):
                 return 'HLALocus'
