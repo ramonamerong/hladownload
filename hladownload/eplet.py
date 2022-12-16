@@ -15,7 +15,7 @@ epletLinks = {
     'DRB': "https://www.epregistry.com.br/index/databases/database/DRB/",
     'DQ': "https://www.epregistry.com.br/index/databases/database/DQ/",
     'DP': "https://www.epregistry.com.br/index/databases/database/DP/",
-    'MICB': "http://epregistry.ufpi.br/index/databases/database/MICA/"
+    'MICA': "http://epregistry.ufpi.br/index/databases/database/MICA/"
 }
 #Request header to prevent 403 error
 requestHeader = {
@@ -38,7 +38,7 @@ locusGroupToLocus = {
     'DRB': ['DRB1', 'DRB3', 'DRB4', 'DRB5'],
     'DQ': ['DQA1', 'DQB1'],
     'DP': ['DPA1', 'DPB1'],
-    'MICB': ['MICB']
+    'MICA': ['MICA']
 }
 locusToLocusGroup = {
     'A': 'ABC',
@@ -53,7 +53,7 @@ locusToLocusGroup = {
     'DQB1': 'DQ',
     'DPA1': 'DP',
     'DPB1': 'DP',
-    'MICB': 'MICB'
+    'MICA': 'MICA'
 }
 epletLoci = list(locusToLocusGroup.keys())
 
