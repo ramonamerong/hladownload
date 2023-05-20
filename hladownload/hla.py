@@ -4,7 +4,7 @@ from os.path import join, isdir
 from collections import Counter
 from copy import copy
 from Bio import SeqIO, AlignIO
-from Bio.Seq import Seq, MutableSeq, UnknownSeq
+from Bio.Seq import Seq, MutableSeq
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
 from Bio.Data.CodonTable import TranslationError
