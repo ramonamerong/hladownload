@@ -15,7 +15,7 @@ epletLinks = {
     'DRB': "https://www.epregistry.com.br/index/databases/database/DRB/",
     'DQ': "https://www.epregistry.com.br/index/databases/database/DQ/",
     'DP': "https://www.epregistry.com.br/index/databases/database/DP/",
-    'MICA': "http://epregistry.ufpi.br/index/databases/database/MICA/"
+    'MICA': "http://epregistry.com.br/index/databases/database/MICA/"
 }
 #Request header to prevent 403 error
 requestHeader = {
